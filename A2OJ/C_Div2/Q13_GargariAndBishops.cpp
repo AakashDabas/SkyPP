@@ -1,12 +1,14 @@
 #include<iostream>
 #include<vector>
 #include<climits>
+#include<stdio.h>
+
 
 typedef long long int lli;
 
 using namespace std;
 
-void Compute(vector<vector<int> > mat, vector<vector<int> > &mark, int n, vector<lli> &dp, bool flag)
+void Compute(vector<vector<lli> > mat, vector<vector<int> > &mark, int n, vector<lli> &dp, bool flag)
 {
     int i = 0, j = 0, cnt = 0;
     if(!flag)
@@ -41,58 +43,50 @@ void Compute(vector<vector<int> > mat, vector<vector<int> > &mark, int n, vector
     }
 }
 
-void GetCoordinates(vector<lli> dpRt, vector<lli> dpLt, vector<vector<int> > markRt, vector<vector<int> > markLt, int n)
+void GetCoordinates(vector<vector<lli> > mat, vector<lli> dpRt, vector<lli> dpLt, vector<vector<int> > markRt, vector<vector<int> > markLt, int n)
 {
-    lli mxW = INT_MIN, mxB = INT_MIN, xW, yW, xB, yB;
-    int cnt = 0;
-    for(int i = 0; i < n; i++)
+    lli mxB, mxW, x1, y1, x2, y2;
+    mxB = mxW = INT_MIN;
+    lli cnt = 0;
+    for(int i = 0; i < n; i++){
         for(int j = 0; j < n; j++){
             lli sum = 0;
             sum += dpRt[markRt[i][j]];
             sum += dpLt[markLt[i][j]];
+            sum -= mat[i][j];
             if(cnt % 2 == 0 && sum > mxB){
-                xB = i;
-                yB = j;
                 mxB = sum;
+                x1 = i;
+                y1 = j;
             }
-            else if(sum > mxW){
-                xW = i;
-                yW = j;
+            else if(cnt % 2 == 1 && sum > mxW){
                 mxW = sum;
+                x2 = i;
+                y2 = j;
             }
             cnt++;
         }
-    cout << mxB << " " << mxW << endl;
-    cout << xB + 1 << " " << yB + 1 << " " << xW + 1 << " " << yW + 1;
+        if(n % 2 == 0)
+            cnt++;
+    }
+    cout << mxB + mxW << "\n" << x1 + 1 << " " << y1 + 1 << " " << x2 + 1 << " " << y2 + 1;
 }
 
 int main(){
     int n;
     cin >> n;
-    vector<vector<int> > mat(n, vector<int>(n, 0)), markRt(n, vector<int>(n, 0)), markLt(n, vector<int>(n, 0));
+    vector<vector<lli> > mat(n, vector<lli>(n, 0));
+    vector<vector<int> > markRt(n, vector<int>(n, 0)), markLt(n, vector<int>(n, 0));
     for(int i = 0; i < n; i++)
         for(int j = 0; j < n; j++)
-            cin >> mat[i][j];
+        {
+            int tmp;
+            scanf("%d", &tmp);
+            mat[i][j] = tmp;
+        }
     vector<lli> dpRt(2 * n - 1, 0), dpLt(2 * n - 1, 0);
     Compute(mat, markRt, n, dpRt, 1);
     Compute(mat, markLt, n, dpLt, 0);
-    for(int i = 0; i < n; i++){
-        cout << endl;
-        for(int j = 0; j < n; j++)
-            cout << markRt[i][j] << " ";
-    }
-    cout << endl;
-    for(int i = 0; i < n; i++){
-        cout << endl;
-        for(int j = 0; j < n; j++)
-            cout << markLt[i][j] << " ";
-    }
-    cout <<"\n\nRight:\n";
-    for(int i = 0; i < 2 * n - 1; i++)
-        cout << i << " " << dpRt[i] << endl;
-    cout <<"\n\nLeft:\n";
-    for(int i = 0; i < 2 * n - 1; i++)
-        cout << i << " " << dpLt[i] << endl;
-    GetCoordinates(dpRt, dpLt, markRt, markLt, n);
+    GetCoordinates(mat, dpRt, dpLt, markRt, markLt, n);
     return 0;
 }
